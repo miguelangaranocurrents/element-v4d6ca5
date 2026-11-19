@@ -273,6 +273,25 @@ describe("TextualBodyViewModel", () => {
         expect(window.location.hash).toBe("#/room/!room:example.org");
     });
 
+    it("does not navigate when a link handler has already handled the click", () => {
+        const vm = createVm();
+        const preventDefault = vi.fn();
+        const anchor = { href: "https://matrix.to/#/@user:example.org", nodeName: "A" };
+        vi.spyOn(permalinkUtils, "tryTransformPermalinkToLocalHref").mockReturnValue("#/user/@user:example.org");
+
+        vm.onRootClick({
+            defaultPrevented: true,
+            preventDefault,
+            target: {
+                nodeName: "SPAN",
+                closest: vi.fn().mockReturnValue(anchor),
+            },
+        } as any);
+
+        expect(preventDefault).not.toHaveBeenCalled();
+        expect(window.location.hash).toBe("");
+    });
+
     it("leaves external root clicks alone when no local permalink is found", () => {
         const vm = createVm();
         const preventDefault = vi.fn();

@@ -73,7 +73,12 @@ export const Commands = [
         args: "<message>",
         description: _td("slash_command|spoiler"),
         runFn: function (cli, roomId, threadId, message = "") {
-            return successSync(ContentHelpers.makeHtmlMessage(message, `<span data-mx-spoiler>${message}</span>`));
+            // Keep formatting such as **bold** inside the spoiler, like a normal message would render it.
+            const isMarkdownEnabled = SettingsStore.getValue("MessageComposerInput.useMarkdown");
+            const formatted = isMarkdownEnabled ? htmlSerializeFromMdIfNeeded(message) : undefined;
+            return successSync(
+                ContentHelpers.makeHtmlMessage(message, `<span data-mx-spoiler>${formatted ?? message}</span>`),
+            );
         },
         category: CommandCategories.messages,
     }),

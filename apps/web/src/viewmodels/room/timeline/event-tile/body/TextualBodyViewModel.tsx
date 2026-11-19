@@ -281,7 +281,9 @@ export class TextualBodyViewModel
             target = target.closest<HTMLLinkElement>("a");
         }
 
-        if (!target) {
+        // A link handler lower in the tree (e.g. the user pill) has already handled this click, so don't
+        // navigate on top of it.
+        if (!target || event.defaultPrevented) {
             return;
         }
 
